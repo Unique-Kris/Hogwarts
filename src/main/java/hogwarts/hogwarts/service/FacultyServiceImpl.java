@@ -1,6 +1,6 @@
 package hogwarts.hogwarts.service;
 
-import hogwarts.hogwarts.exception.FacultyAlreadyExistsException;
+import hogwarts.hogwarts.exception.NotFoundFacultyException;
 import hogwarts.hogwarts.model.Faculty;
 import hogwarts.hogwarts.repositories.FacultyRepository;
 import org.springframework.stereotype.Service;
@@ -19,14 +19,14 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     public Faculty findFaculty(long id) {
-        return facultyRepository.findById(id).get();
+        return facultyRepository.findById(id).orElseThrow(NotFoundFacultyException::new);
     }
 
     public Faculty editFaculty(long id, Faculty faculty) {
-        if (!facultyRepository.existsById(id)) {
-            throw new FacultyAlreadyExistsException();
-        }
-        return facultyRepository.save(faculty);
+        Faculty exist = facultyRepository.findById(id).orElseThrow();
+        exist.setName(faculty.getName());
+        exist.setColor(faculty.getColor());
+        return facultyRepository.save(exist);
     }
 
     public void deleteFaculty(long id) {
