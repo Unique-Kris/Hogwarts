@@ -1,24 +1,46 @@
 package hogwarts.hogwarts.controller;
 
+import hogwarts.hogwarts.exception.NotFoundFacultyException;
+import hogwarts.hogwarts.model.Faculty;
 import hogwarts.hogwarts.model.Student;
+import hogwarts.hogwarts.service.FacultyService;
 import hogwarts.hogwarts.service.StudentService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
+
 @RestController
-@RequestMapping("/student")  // Переносим общий путь сюда
+@RequestMapping("/student")
 public class StudentController {
 
     private final StudentService studentService;
 
-    public StudentController(StudentService studentService) {
+    private FacultyService facultyService;
+
+    public StudentController(StudentService studentService, FacultyService facultyService) {
         this.studentService = studentService;
+        this.facultyService = facultyService;
     }
 
-    @GetMapping("/{id}")  // Путь теперь /student/{id}
+    @GetMapping("/{id}/faculty")
+    public Faculty getFacultyOfStudent(@PathVariable Long id) {
+        Student student = studentService.findStudent(id);
+        if (student != null) {
+            return student.getFaculty();
+        } else {
+            throw new NotFoundFacultyException();
+        }
+    }
+
+    @GetMapping("/{id}")
     public Student getStudent(@PathVariable Long id) {
         return studentService.findStudent(id);
+    }
+
+    @GetMapping
+    public ResponseEntity<Collection<Student>> getAllStudents() {
+        return ResponseEntity.ok(studentService.getAllStudents());
     }
 
     @PostMapping
@@ -27,12 +49,8 @@ public class StudentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Student> editStudent(@PathVariable Long id, @RequestBody Student student) {  // Исправил на editStudent
-        Student found = studentService.editStudent(id, student);
-        if (found == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-        return ResponseEntity.ok(found);
+    public Student editStudent(@PathVariable Long id, @RequestBody Student student) {  // Исправил на editStudent
+        return studentService.editStudent(id, student);
     }
 
     @DeleteMapping("/{id}")
