@@ -3,6 +3,7 @@ package hogwarts.hogwarts.controller;
 import hogwarts.hogwarts.model.Faculty;
 import hogwarts.hogwarts.service.FacultyService;
 import hogwarts.hogwarts.service.StudentService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,35 +15,40 @@ public class FacultyController {
 
     private final FacultyService facultyService;
 
-    private StudentService studentService;
-
-    public FacultyController(FacultyService facultyService, StudentService studentService) {
+    public FacultyController(FacultyService facultyService) {
         this.facultyService = facultyService;
-        this.studentService = studentService;
     }
 
     @GetMapping("/{id}")
-    public Faculty getFaculty(@PathVariable Long id) {
-        return facultyService.findFaculty(id);
+    public ResponseEntity<Faculty> getFaculty(@PathVariable Long id) {
+        Faculty faculty = facultyService.findFaculty(id);
+        return ResponseEntity.ok(faculty);
     }
 
     @GetMapping
     public ResponseEntity<Collection<Faculty>> getAllFaculty() {
-        return ResponseEntity.ok(facultyService.getAllFaculty());
+        Collection<Faculty> faculties = facultyService.getAllFaculty();
+        if (faculties.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(faculties);
     }
 
     @PostMapping
-    public Faculty createFaculty(@RequestBody Faculty faculty) {
-        return facultyService.addFaculty(faculty);
+    public ResponseEntity<Faculty> createFaculty(@RequestBody Faculty faculty) {
+        Faculty createdFaculty = facultyService.addFaculty(faculty);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdFaculty);
     }
 
     @PutMapping("/{id}")
-    public Faculty editFaculty(@PathVariable Long id, @RequestBody Faculty faculty) {
-        return facultyService.editFaculty(id, faculty);
+    public ResponseEntity<Faculty> editFaculty(@PathVariable Long id, @RequestBody Faculty faculty) {
+        Faculty updatedFaculty = facultyService.editFaculty(id, faculty);
+        return ResponseEntity.ok(updatedFaculty);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteFaculty(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteFaculty(@PathVariable Long id) {
         facultyService.deleteFaculty(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
