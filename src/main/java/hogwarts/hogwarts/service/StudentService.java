@@ -1,10 +1,7 @@
 package hogwarts.hogwarts.service;
 
-import hogwarts.hogwarts.model.Avatar;
 import hogwarts.hogwarts.model.Student;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,9 +19,9 @@ public interface StudentService {
 
     List<Student> findByAge(int age);
 
-    Avatar findAvatar(long studentId);
+    Long countAllStudents();
 
-    void uploadAvatar(Long studentId, MultipartFile file) throws IOException;
+    Double getAverageAge();
 
-    String getExtension(String fileName);
+    List<Student> getLastFiveStudents();
 }
