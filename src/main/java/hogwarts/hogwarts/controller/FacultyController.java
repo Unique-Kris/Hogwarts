@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Comparator;
 
 @RestController
 @RequestMapping("/faculty")
@@ -50,5 +51,15 @@ public class FacultyController {
     public ResponseEntity<Void> deleteFaculty(@PathVariable Long id) {
         facultyService.deleteFaculty(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/longest-faculty-name")
+    public ResponseEntity<String> getLongestFacultyName() {
+        Collection<Faculty> faculties = facultyService.getAllFaculty();
+        String longestFacultyName = faculties.stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length))
+                .orElse("Факультет не найден");
+        return ResponseEntity.ok(longestFacultyName);
     }
 }
