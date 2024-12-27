@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/student")
@@ -76,5 +78,37 @@ public class StudentController {
     public ResponseEntity<List<Student>> getLastFiveStudents() {
         List<Student> lastFive = studentService.getLastFiveStudents();
         return ResponseEntity.ok(lastFive);
+    }
+
+    @GetMapping("/names-starting-with-a")
+    public ResponseEntity<Collection<String>> getNamesStartingWithA() {
+        Collection<Student> students = studentService.getAllStudents();
+        Collection<String> filteredNames = students.stream()
+                .map(Student::getName)
+                .filter(name -> name.toUpperCase().startsWith("A"))
+                .map(String::toUpperCase)
+                .sorted()
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(filteredNames);
+    }
+
+    @GetMapping("/average-age-stream")
+    public ResponseEntity<Double> getAverageAgeStream() {
+        Collection<Student> students = studentService.getAllStudents();
+        double averageAge = students.stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0.0);
+        return ResponseEntity.ok(averageAge);
+    }
+
+    @GetMapping("/sum")
+    public ResponseEntity<Integer> getSum() {
+        int sum = Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .reduce(0, (a, b) -> a + b);
+
+        return ResponseEntity.ok(sum);
     }
 }
