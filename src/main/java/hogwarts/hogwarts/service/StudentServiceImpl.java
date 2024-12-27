@@ -118,4 +118,9 @@ public class StudentServiceImpl implements StudentService {
 
         return lastFiveStudents;
     }
+
+    @Override
+    public synchronized void synchronizedPrint(String name) {
+        System.out.println(name);
+    }
 }

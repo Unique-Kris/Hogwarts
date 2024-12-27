@@ -111,4 +111,56 @@ public class StudentController {
 
         return ResponseEntity.ok(sum);
     }
+
+    @GetMapping("/print-parallel")
+    public void printStudentsInParallel() {
+        Collection<Student> students = studentService.getAllStudents();
+        List<String> studentNames = students.stream()
+                .map(Student::getName)
+                .toList();
+
+        if (studentNames.size() < 6) {
+            System.out.println("Недостаточно студентов для выполнения операции");
+            return;
+        }
+
+        System.out.println(studentNames.get(0));
+        System.out.println(studentNames.get(1));
+
+        new Thread(() -> {
+            System.out.println(studentNames.get(2));
+            System.out.println(studentNames.get(3));
+        }).start();
+
+        new Thread(() -> {
+            System.out.println(studentNames.get(4));
+            System.out.println(studentNames.get(5));
+        }).start();
+    }
+
+    @GetMapping("/print-synchronized")
+    public void printStudentsSynchronized() {
+        Collection<Student> students = studentService.getAllStudents();
+        List<String> studentNames = students.stream()
+                .map(Student::getName)
+                .toList();
+
+        if (studentNames.size() < 6) {
+            System.out.println("Недостаточно студентов для выполнения операции");
+            return;
+        }
+
+        studentService.synchronizedPrint(studentNames.get(0));
+        studentService.synchronizedPrint(studentNames.get(1));
+
+        new Thread(() -> {
+            studentService.synchronizedPrint(studentNames.get(2));
+            studentService.synchronizedPrint(studentNames.get(3));
+        }).start();
+
+        new Thread(() -> {
+            studentService.synchronizedPrint(studentNames.get(4));
+            studentService.synchronizedPrint(studentNames.get(5));
+        }).start();
+    }
 }

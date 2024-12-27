@@ -24,4 +24,6 @@ public interface StudentService {
     Double getAverageAge();
 
     List<Student> getLastFiveStudents();
+
+    void synchronizedPrint(String name);
 }
